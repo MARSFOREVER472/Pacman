@@ -42,6 +42,8 @@ namespace Comecocos
         public MainWindow()
         {
             InitializeComponent();
+
+            SetUp(); // LLAMADO DEL MÉTODO PARA IMPORTAR TODO DESDE UN ALGORITMO YA REALIZADO.
         }
 
         private void CanvasKeyDown(object sender, KeyEventArgs e)
@@ -104,6 +106,105 @@ namespace Comecocos
                 pacman.RenderTransform = new RotateTransform(90, pacman.Width / 2, pacman.Height / 2); // GIRA AL PERSONAJE MEDIANTE ESTE ALGORITMO HACIA ABAJO.
             }
 
+        }
+
+        // EN EL SIGUIENTE MÉTODO QUE SE MOSTRARÁ A CONTINUACIÓN SE REALIZARÁN LAS CONFIGURACIONES A LA INTERFAZ DEL JUEGO EN EL WPF.
+
+        private void SetUp()
+        {
+            MyCanvas.Focus(); // LA ITERACIÓN "MyCanvas" HACE REFERENCIA A LA FUNCIÓN PRINCIPAL PARA LA VISUALIZACIÓN DE LA INTERFAZ DEL JUEGO EN WPF.
+
+            // LUEGO, SE REALIZARÁN LAS CONFIGURACIONES DEL TEMPORIZADOR HACIA ESTA INTERFAZ.
+
+            temporizador.Tick += GameLoop; // SE ENLAZA EN CONJUNTO CON EL MÉTODO DECLARADO PARA HACERLO FUNCIONAR EL TEMPORIZADOR EN UN INSTANTE.
+            temporizador.Interval = TimeSpan.FromMilliseconds(20); // EL TIEMPO INSTANTÁNEO SE CONFIGURÓ EN 20 MILISEGUNDOS.
+            temporizador.Start(); // INICIALIZA EL TEMPORIZADOR.
+            movimientosActualesFantasma = limiteMovimientosFantasma; // AJUSTE DE MOVIMIENTOS PARA LOS FANTASMAS.
+
+            // FINALMENTE, REALIZAREMOS LAS ÚLTIMAS CONFIGURACIONES A LOS PERSONAJES DEL JUEGO.
+
+            ImageBrush pacmanImage = new ImageBrush(); // EDITAREMOS AL PACMAN.
+            pacmanImage.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/pacman.jpg")); // LO VAMOS A IMPORTAR EN EL RECTÁNGULO AMARILLO A ESTE PERSONAJE.
+            pacman.Fill = pacmanImage; // LO COLOREAMOS A ESTE PERSONAJE EN EL RECTÁNGULO CORRESPONDIENTE TAL CUÁL COMO SE HABÍA DECLARADO EN ESTA SECCIÓN.
+
+            ImageBrush blinky = new ImageBrush(); // EDITAREMOS A BLINKY, EL FANTASMA ROJO.
+            blinky.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/red.jpg")); // LO VAMOS A IMPORTAR EN EL RECTÁNGULO ROJO A ESTE PERSONAJE.
+            redGuy.Fill = blinky; // LO COLOREAMOS A ESTE PERSONAJE EN EL RECTÁNGULO CORRESPONDIENTE TAL CUÁL COMO SE HABÍA DECLARADO EN ESTA SECCIÓN.
+
+            ImageBrush clyde = new ImageBrush(); // EDITAREMOS A CLYDE, EL FANTASMA NARANJA.
+            clyde.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/orange.jpg")); // LO VAMOS A IMPORTAR EN EL RECTÁNGULO NARANJO A ESTE PERSONAJE.
+            orangeGuy.Fill = clyde; // LO COLOREAMOS A ESTE PERSONAJE EN EL RECTÁNGULO CORRESPONDIENTE TAL CUÁL COMO SE HABÍA DECLARADO EN ESTA SECCIÓN.
+
+            ImageBrush pinky = new ImageBrush(); // EDITAREMOS A PINKY EL FANTASMA ROSADO.
+            pinky.ImageSource = new BitmapImage(new Uri("pack://application:,,,/images/pink.jpg")); // LO VAMOS A IMPORTAR EN EL RECTÁNGULO AMARILLO A ESTE PERSONAJE.
+            pinkGuy.Fill = pinky; // LO COLOREAMOS A ESTE PERSONAJE EN EL RECTÁNGULO CORRESPONDIENTE TAL CUÁL COMO SE HABÍA DECLARADO EN ESTA SECCIÓN.
+        }
+
+        private void GameLoop(object sender, EventArgs e)
+        {
+            // MÉTODO DE COMPILACIÓN DE LA INTERFAZ DEL JUEGO EN WPF.
+
+            txtScore.Content = "Puntuación: " + puntuacion; // EL CONTENIDO DEL TEXTO SE MOSTRARÁ EN LA VENTANA DE JUEGO EN WPF.
+
+            // SE INICIALIZA EL PROGRAMA MOVIENDO AL PERSONAJE EN DISTINTAS DIRECCIONES.
+
+            if (derechaTrue) // SI EL PERSONAJE VA HACIA LA DERECHA.
+            {
+                Canvas.SetLeft(pacman, Canvas.GetLeft(pacman) + velocidad); // AÑADE SU VELOCIDAD YA DECLARADO EN UNA VARIABLE ANTERIORMENTE.
+            }
+
+            if (izquierdaTrue) // SI EL PERSONAJE VA HACIA LA IZQUIERDA.
+            {
+                Canvas.SetLeft(pacman, Canvas.GetLeft(pacman) - velocidad); // AÑADE SU VELOCIDAD YA DECLARADO EN UNA VARIABLE ANTERIORMENTE PERO DE LO CONTRARIO HACIA AL OTRO LADO.
+            }
+
+            if (arribaTrue) // SI EL PERSONAJE VA HACIA ARRIBA.
+            {
+                Canvas.SetTop(pacman, Canvas.GetTop(pacman) - velocidad); // AÑADE SU VELOCIDAD YA DECLARADO EN UNA VARIABLE ANTERIORMENTE PERO DE LO CONTRARIO HACIA AL OTRO LADO.
+            }
+
+            if (abajoTrue) // SI EL PERSONAJE VA HACIA ABAJO.
+            {
+                Canvas.SetLeft(pacman, Canvas.GetLeft(pacman) + velocidad); // AÑADE SU VELOCIDAD YA DECLARADO EN UNA VARIABLE ANTERIORMENTE.
+            }
+
+            // FIN DE LOS MOVIMIENTOS DEL PERSONAJE.
+
+            // INICIALMENTE, ESTE PERSONAJE VA A QUEDAR PARADO, PERO SIN MOVERSE POR NINGÚN MOTIVO.
+
+            if (abajoTrue && Canvas.GetTop(pacman) + 80 > Application.Current.MainWindow.Height)
+            {
+                // Si este personaje se está moviendo hacia abajo, la posición de éste es mayor que la altura de la ventana principal, entonces detén el movimiento hacia abajo.
+
+                abajoFalse = true;
+                abajoTrue = false;
+            }
+
+            if (arribaTrue && Canvas.GetTop(pacman) < 1)
+            {
+                // Si este personaje se está moviendo y la posición de éste es menor que 1 entonces se detendrá el movimiento hacia arriba.
+
+                arribaFalse = true;
+                arribaTrue = false;
+            }
+
+            if (izquierdaTrue && Canvas.GetLeft(pacman) - 10 < 1)
+            {
+                // Si este personaje se está moviendo hacia la izquierda y la posición de éste es menor que 1 entonces se detendrá el movimiento hacia la izquierda.
+
+                arribaFalse = true;
+                arribaTrue = false;
+            }
+
+            if (derechaTrue && Canvas.GetLeft(pacman) + 70 > Application.Current.MainWindow.Width)
+            {
+                // Si este personaje se está moviendo hacia la derecha, la posición de éste es mayor que el ancho de la ventana principal, entonces detén el movimiento hacia la derecha.
+
+                derechaFalse = true;
+                derechaTrue = false;
+            }
+
+            // EN INSTANTES...
         }
     }
 }
